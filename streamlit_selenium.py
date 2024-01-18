@@ -2,9 +2,9 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import re
-# import nltk
+import nltk
 from nltk.corpus import stopwords
-# nltk.download('stopwords')
+nltk.download('stopwords')
 from youtube_transcript_api import YouTubeTranscriptApi
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -201,7 +201,7 @@ def main():
             st.error("Error fetching data from the YouTube API, Status code: {response.status_code}")
             # Send the input to the Google Apps Script using a GET request
 
-        subject_to_search = st.text_input("Enter the subject:", "python")
+        subject_to_search = st.text_input("Enter the subject:", "Enter your subject...")
 
         # Display a submit button
         submit_button = st.button("Submit")
