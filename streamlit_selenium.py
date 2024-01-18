@@ -94,11 +94,11 @@ def get_course_info(subject):
     # Set up the WebDriver using the service
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     # Open the Udemy website
-    driver.get('https://www.udemy.com/courses/search/?q=' + subject)
+    driver.get('https://www.coursera.org/search?query=' + subject)
     # Wait for the page to load (you might need to adjust the time based on your internet speed)
     driver.implicitly_wait(5)
     # Find all course elements
-    course_elements = driver.find_elements(By.XPATH, "//div[@class='course-card-module--image-container--20x0M']/img")
+    course_elements = driver.find_elements(By.XPATH, "//div[@class="cds-9 css-18msmec cds-10"]/img")
     # Extract course information
     course_info = [{'title': title.text,
                     'link': title.find_element(By.TAG_NAME, 'a').get_attribute('href'),
