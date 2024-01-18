@@ -3,7 +3,6 @@ import requests
 import re
 import nltk
 from nltk.corpus import stopwords
-from sympy import use
 nltk.download('stopwords')
 from youtube_transcript_api import YouTubeTranscriptApi
 from reportlab.lib.pagesizes import letter
