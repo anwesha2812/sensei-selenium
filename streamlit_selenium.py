@@ -202,23 +202,32 @@ def main():
             st.error("Error fetching data from the YouTube API, Status code: {response.status_code}")
             # Send the input to the Google Apps Script using a GET request
 
-        subject_to_search = user_input   
-        st.header(f"Coursera {subject_to_search.capitalize()} Courses")
+        subject_to_search = st.text_input("Enter the subject:", "python")
 
-        # Check if the user has entered a subject
-        if subject_to_search:
-            course_info = get_course_info(subject_to_search)
+        # Display a submit button
+        submit_button = st.button("Submit")
 
-            for info in course_info[:5]:
-                # Display each container with thumbnail in the left column and title in the right column
-                st.markdown(
-                    f'<div class="row" style="margin: 10px; display: flex; align-items: center; justify-content: space-around;">'
-                    f'   <div style="flex: 1;"><a href="{info["link"]}" target="_blank"><img src="{info["image"]}" alt="{info["title"]}" style="width: 120px; height: 120px;"></a></div>'
-                    f'   <div style="flex: 2; text-align: justify; font-weight: bold; margin: 10px;"><a href="{info["link"]}" target="_blank">{info["title"]}</a></div>'
-                    f'</div>', unsafe_allow_html=True
-                )
+        # Check if the submit button is clicked
+        if submit_button:
+            # Display courses with images and titles in separate columns using Streamlit
+            st.title(f"Coursera {subject_to_search.capitalize()} Courses")
 
-            st.write("---")
+            # Check if the user has entered a subject
+            if subject_to_search:
+                course_info = get_course_info(subject_to_search)
+
+                for info in course_info[:5]:
+                    # Display each container with thumbnail in the left column and title in the right column
+                    st.markdown(
+                        f'<div class="row" style="margin: 10px; display: flex; align-items: center; justify-content: space-around;">'
+                        f'   <div style="flex: 1;"><a href="{info["link"]}" target="_blank"><img src="{info["image"]}" alt="{info["title"]}" style="width: 120px; height: 120px;"></a></div>'
+                        f'   <div style="flex: 2; text-align: justify; font-weight: bold; margin: 10px;"><a href="{info["link"]}" target="_blank">{info["title"]}</a></div>'
+                        f'</div>', unsafe_allow_html=True
+                    )
+
+                st.write("---")
+
+
 
         else:
             st.warning("Please enter a subject to search for courses.")
