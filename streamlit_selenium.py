@@ -1,10 +1,10 @@
 import streamlit as st
 import requests
-import re
-import nltk
 from bs4 import BeautifulSoup
+import re
+# import nltk
 from nltk.corpus import stopwords
-nltk.download('stopwords')
+# nltk.download('stopwords')
 from youtube_transcript_api import YouTubeTranscriptApi
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -120,7 +120,6 @@ def get_course_info(subject):
     return course_info
 
 
-
 # Define the Streamlit app
 def main():
     # Set title of the browser tab
@@ -226,9 +225,6 @@ def main():
                     )
 
                 st.write("---")
-
-
-
         else:
             st.warning("Please enter a subject to search for courses.")
     else:
@@ -243,5 +239,8 @@ def main():
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 if __name__ == "__main__":
     main()
+
+
+
 
 
