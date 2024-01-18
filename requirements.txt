@@ -1,0 +1,5 @@
+selenium
+reportlab 
+webdriver_manager 
+youtube-transcript-api
+nltk
