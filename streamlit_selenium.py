@@ -98,7 +98,7 @@ def get_course_info(subject):
     # Wait for the page to load (you might need to adjust the time based on your internet speed)
     driver.implicitly_wait(5)
     # Find all course elements
-    course_elements = driver.find_elements(By.XPATH, "//div[@class="cds-9 css-18msmec cds-10"]/img")
+    course_elements = driver.find_elements(By.XPATH, "//div[@class="cds-9 css-18msmec cds-10"]")
     # Extract course information
     course_info = [{'title': title.text,
                     'link': title.find_element(By.TAG_NAME, 'a').get_attribute('href'),
