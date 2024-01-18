@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import re
 import nltk
+from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
 nltk.download('stopwords')
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -9,7 +10,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 # Replace 'YOUR_API_KEY' with your actual API key
@@ -90,23 +91,34 @@ def generate_pdf(text, output_file):
 
 
 def get_course_info(subject):
-    # Set up the ChromeDriver service with executable_path
-    # Set up the WebDriver using the service
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    # Open the Udemy website
-    driver.get('https://www.coursera.org/search?query=' + subject)
-    # Wait for the page to load (you might need to adjust the time based on your internet speed)
-    driver.implicitly_wait(5)
-    # Find all course elements
-    course_elements = driver.find_elements(By.XPATH, "//div[@class='cds-9 css-18msmec cds-10']")
-    # Extract course information
-    course_info = [{'title': title.text,
-                    'link': title.find_element(By.TAG_NAME, 'a').get_attribute('href'),
-                    'thumbnail': element.get_attribute('src')} for title, element in zip(driver.find_elements(By.XPATH, "//h3[@data-purpose='course-title-url']"), course_elements)]
+    # Set up ChromeOptions for headless mode
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')  # Set the headless option
+    options.add_argument('--disable-extensions')  # Disable extensions, including external scripts
 
-    # Quit the driver
-    driver.quit()
+    # Set up the ChromeDriver service with executable_path
+    with webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options) as driver:
+        # Load the Coursera search URL
+        driver.get(f'https://www.coursera.org/search?query={subject}')
+
+        # Wait for the page to load (you might need to adjust the time based on your internet speed)
+        driver.implicitly_wait(5)
+
+        # Find all course elements using corrected XPath
+        course_elements = driver.find_elements(By.CLASS_NAME, "cds-9.css-0.cds-11.cds-grid-item.cds-56.cds-64.cds-76")
+
+        # Extract course information for the top 5 courses
+        course_info = [
+            {
+                'title': title.find_element(By.CLASS_NAME, "cds-119.cds-CommonCard-title.css-e7lgfl.cds-121").text.strip(),
+                'link': title.find_element(By.CLASS_NAME, "cds-119.cds-113.cds-115.cds-CommonCard-titleLink.css-si869u.cds-142").get_attribute('href'),
+                'image': title.find_element(By.CLASS_NAME, "cds-9.css-0.cds-11.cds-grid-item.cds-56.cds-64.cds-76 img").get_attribute('src')
+            }
+            for title in course_elements[:5]
+        ]
+
     return course_info
+
 
 
 # Define the Streamlit app
@@ -191,24 +203,23 @@ def main():
             # Send the input to the Google Apps Script using a GET request
 
         subject_to_search = user_input   
-        st.header(f"Recommended Udemy Courses")
-
-        # Create a single row layout with CSS flexbox
-        st.markdown('<style>div.row { display: flex; justify-content: space-around; }</style>', unsafe_allow_html=True)
+        st.header(f"Coursera {subject_to_search.capitalize()} Courses")
 
         # Check if the user has entered a subject
         if subject_to_search:
             course_info = get_course_info(subject_to_search)
 
             for info in course_info[:5]:
-                # Display each container with thumbnail and title in a single row with equal margin
+                # Display each container with thumbnail in the left column and title in the right column
                 st.markdown(
-                    f'<div class="row" style="margin: 10px;">'
-                    f'   <a href="{info["link"]}" target="_blank"><img src="{info["thumbnail"]}" alt="{info["title"]}" style="width: 240px;"></a>'
-                    f'   <p style="text-align: justify; font-weight: bold; margin: 10px;">{info["title"]}</p>'
+                    f'<div class="row" style="margin: 10px; display: flex; align-items: center; justify-content: space-around;">'
+                    f'   <div style="flex: 1;"><a href="{info["link"]}" target="_blank"><img src="{info["image"]}" alt="{info["title"]}" style="width: 120px; height: 120px;"></a></div>'
+                    f'   <div style="flex: 2; text-align: justify; font-weight: bold; margin: 10px;"><a href="{info["link"]}" target="_blank">{info["title"]}</a></div>'
                     f'</div>', unsafe_allow_html=True
                 )
+
             st.write("---")
+
         else:
             st.warning("Please enter a subject to search for courses.")
     else:
@@ -225,65 +236,3 @@ if __name__ == "__main__":
     main()
 
 
-
-
-
-
-
-
-
-
-
-
-        # script_url = apps_script_url + "?input=" + user_input 
-        # response = requests.get(script_url)
-    
-        # if response.status_code == 200:
-        #     try:
-        #         videos = response.json()
-        #         # Create an empty list to store the thumbnails
-        #         thumbnails = []
-        #         print("======================================")
-        #         print(videos)
-        #         print("======================================")
-        #         for video in videos:
-                    
-        #             thumbnail_url = f"https://img.youtube.com/vi/{video['videoId']}/default.jpg"
-        #             video_link = video['url']
-        #             title = video['channelTitle']
-        #             view_count = video['viewCount']
-        #             like_count = video['likeCount']
-                        
-        #             thumbnail = f"<div class='thumbnail' style='width: 200px; text-align: center;'><a href='{video_link}' target='_blank'><img src='{thumbnail_url}'></a><br>"
-        #             thumbnail += f"<b>Title:</b> {title}<br><br>"
-        #             thumbnail += f"<table style='width:100%;text-align:center;'><tr><th>Views</th><th>Likes</th></tr><tr><td>{view_count}</td><td>{like_count}</td></tr></table></div>"
-                        
-        #             thumbnails.append(thumbnail)
-                
-        #         # Arrange thumbnails using CSS Flexbox
-        #         st.markdown(
-        #             """
-        #             <style>
-        #             .thumbnails-container {
-        #                 display: flex;
-        #                 flex-wrap: wrap;
-        #                 justify-content: space-evenly;
-        #             }
-        #             .thumbnail {
-        #                 margin: 10px;
-        #             }
-        #             </style>
-        #             """,
-        #             unsafe_allow_html=True
-        #         )
-                
-        #         # Display thumbnails
-        #         st.markdown("<div class='thumbnails-container'>" + " ".join(thumbnails) + "</div>", unsafe_allow_html=True)
-        #     except ValueError as e:
-        #         html_content = response.text
-        #         soup = BeautifulSoup(html_content, 'html.parser')
-        #         pretty_html = soup.prettify()
-        #         st.markdown(pretty_html, unsafe_allow_html=True)
-        #         st.error(f"Error parsing JSON: {e}")
-        # else:
-        #     st.error(f"Failed to fetch videos. Status code: {response.status_code}")
