@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 # Replace 'YOUR_API_KEY' with your actual API key
-api_key = "AIzaSyCb2YF2wlgvdY7iNLLah-agV-p6kAEGl2k"
+api_key = "AIzaSyCk5y59_XIlabK3bDipO7FdPSD7lBguxIA"
 
 
 # URL of your Google Apps Script web app
