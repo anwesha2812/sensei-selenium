@@ -6,3 +6,4 @@ nltk
 bs4
 streamlit_chat
 langchain
+pypdf
