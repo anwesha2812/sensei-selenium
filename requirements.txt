@@ -7,3 +7,4 @@ bs4
 streamlit_chat
 langchain
 pypdf
+sentence-transformers
