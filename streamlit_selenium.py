@@ -116,8 +116,8 @@ def generate_pdf(text, output_file):
 def get_course_info(subject):
     # Set up ChromeOptions for headless mode
     options = webdriver.ChromeOptions()
-    #options.add_argument('--headless')  # Set the headless option
-    #options.add_argument('--disable-extensions')  # Disable extensions, including external scripts
+    options.add_argument('--headless')  # Set the headless option
+    options.add_argument('--disable-extensions')  # Disable extensions, including external scripts
 
     # Set up the ChromeDriver service with executable_path
     with webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options) as driver:
